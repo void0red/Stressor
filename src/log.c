@@ -5,7 +5,7 @@
 #include "log.h"
 
 logger Global_Logger = {
-        .log = write_log,
+        .write = write_log,
         .path = NULL,
         .fd = NULL,
         .out = TONone
@@ -33,7 +33,7 @@ void log_init(logger_ptr log, char *path, out_t out) {
             break;
     }
     setlocale(LC_ALL, "zh_CN.UTF-8");
-    log->log(None, "\n\n[global logger]\n\n", 24);
+    log->write(None, "\n\n[global logger]\n\n", 24);
 
 }
 

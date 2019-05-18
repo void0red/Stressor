@@ -31,7 +31,7 @@ typedef enum {
  * @param   path    char*       log file path
  * @param   out     out_t       logger place
  * @param   fd      FILE*       the file pointer
- * @param   log     void(*)(*)  write function
+ * @param   write     void(*)(*)  write function
  */
 typedef struct _logger {
     char *path;
@@ -40,7 +40,7 @@ typedef struct _logger {
 
     FILE *fd;
 
-    void (*log)(level_t level, char *text, int len);
+    void (*write)(level_t level, char *text, int len);
 
 
 } logger, *logger_ptr;
@@ -106,7 +106,7 @@ static void error_write(char *text, int len, FILE *out);
  * Global_Logger variable
  * description:     the global logger(only) exported
  *
- * @member  log     void(*)(*)      write_log
+ * @member  write     void(*)(*)      write_log
  * @member  path    char*           NULL
  * @member  fd      FILE*           NULL
  * @member  out     out_t           TONONE
