@@ -22,7 +22,7 @@ typedef enum {
  * logger level
  */
 typedef enum {
-    None, INFO, WARNING, ERROR
+    None, INFO, WARNING, ERROR, FORMAT
 } level_t;
 
 
@@ -42,7 +42,6 @@ typedef struct _logger {
 
     void (*write)(level_t level, char *text, int len);
 
-
 } logger, *logger_ptr;
 
 
@@ -52,9 +51,8 @@ typedef struct _logger {
  *
  * @param   log     logger_ptr      pointer to the logger
  * @param   path    char*           log file path, can be NULL
- * @param   out     out_t           where to log
  */
-extern void log_init(logger_ptr log, char *path, out_t out);
+extern void log_init(logger_ptr log, char *path);
 
 
 /*
@@ -67,14 +65,20 @@ extern void log_destroy(logger_ptr log);
 
 
 /*
- * write_log function:
+ * global_write function:
  * description:     the global logger write function
  *
+ * @param   _logger logger_ptr      pointer to the logger
  * @param   level   level_t         the level of the message
+ * @param   format  char*           format string
  * @param   text    char*           the message pointer
  * @param   len     int             the length of the `text` string
  */
-static void write_log(level_t level, char *text, int len);
+static void global_write(logger_ptr _logger, level_t level, char *format, char *text, int len);
+
+static void global_stdout_write(level_t level, char *text, int len);
+
+static void global_file_write(level_t level, char *text, int len);
 
 
 /*
@@ -102,15 +106,7 @@ static void warning_write(char *text, int len, FILE *out);
 static void error_write(char *text, int len, FILE *out);
 
 
-/*
- * Global_Logger variable
- * description:     the global logger(only) exported
- *
- * @member  write     void(*)(*)      write_log
- * @member  path    char*           NULL
- * @member  fd      FILE*           NULL
- * @member  out     out_t           TONONE
- */
-extern logger Global_Logger;
+extern logger Global_File_Logger;
+extern logger Global_Stdout_Logger;
 
 #endif //STRESSOR_LOG_H

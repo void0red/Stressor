@@ -5,15 +5,16 @@
 #include "http_get.h"
 
 static int http_write_callback(const void *ptr, size_t size, size_t n, void *stream) {
-    size_t real_size = size * n;
+//    size_t real_size = size * n;
+//
+//    http_response *response = (http_response *) stream;
+//    response->data = (char *) realloc(response->data, real_size + response->length);
+//
+//    memcpy(response->data, ptr, real_size);
+//    response->length += real_size;
 
-    http_response *response = (http_response *) stream;
-    response->data = (char *) realloc(response->data, real_size + response->length);
-
-    memcpy(response->data, ptr, real_size);
-    response->length += real_size;
-
-    return real_size;
+//    return real_size;
+    return 0;
 }
 
 http_response *http_get(const char *url) {

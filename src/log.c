@@ -4,18 +4,24 @@
 
 #include "log.h"
 
-logger Global_Logger = {
-        .write = write_log,
-        .path = NULL,
+logger Global_File_Logger = {
+        .out = TOFILE,
         .fd = NULL,
-        .out = TONone
+        .write = global_file_write,
+        .path = NULL,
 };
 
-void log_init(logger_ptr log, char *path, out_t out) {
-    log->path = path;
-    log->out = out;
+logger Global_Stdout_Logger = {
+        .out = TOSTDOUT,
+        .fd = NULL,
+        .write = global_stdout_write,
+        .path = NULL,
+};
 
-    switch (out) {
+void log_init(logger_ptr log, char *path) {
+    log->path = path;
+
+    switch (log->out) {
         default:
         case TONone:
             break;
@@ -40,6 +46,8 @@ void log_init(logger_ptr log, char *path, out_t out) {
 void log_destroy(logger_ptr log) {
     if (log->out == TOFILE) {
         fclose(log->fd);
+    } else {
+        fflush(log->fd);
     }
 }
 
@@ -54,29 +62,39 @@ static void get_time(char *buf, int max) {
     }
 }
 
-void write_log(level_t level, char *text, int len) {
+inline void global_write(logger_ptr logger, level_t level, char *format, char *text, int len) {
 
     if (text == NULL || len <= 0)
         return;
 
     char buf[len + 1];
     strncpy(buf, text, len);
-    buf[len - 1] = '\0';
+    buf[len] = '\0';
 
     switch (level) {
         case INFO:
-            info_write(buf, len, Global_Logger.fd);
+            info_write(buf, len, logger->fd);
             break;
         case WARNING:
-            warning_write(buf, len, Global_Logger.fd);
+            warning_write(buf, len, logger->fd);
             break;
         case ERROR:
-            error_write(buf, len, Global_Logger.fd);
+            error_write(buf, len, logger->fd);
             break;
+        case FORMAT:
+            fprintf(logger->fd, format, buf);
         default:
-            fprintf(Global_Logger.fd, "%s", buf);
+            fprintf(logger->fd, "%s", buf);
             break;
     }
+}
+
+static void global_file_write(level_t level, char *text, int len) {
+    global_write(&Global_File_Logger, level, NULL, text, len);
+}
+
+static void global_stdout_write(level_t level, char *text, int len) {
+    global_write(&Global_Stdout_Logger, level, NULL, text, len);
 }
 
 static void info_write(char *text, int len, FILE *out) {
