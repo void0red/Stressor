@@ -19,10 +19,13 @@ int main(int argc, char *argv[]) {
     char *url = NULL;
     char *log_path = NULL;
     int times = 100;
+    int thread_nums = 64;
     switch (argc) {
         default:
-            fprintf(stderr, "Usage: %s url [log path] [ping times]\n", argv[0]);
+            fprintf(stderr, "Usage: %s url [log path] [ping times] [thread nums]\n", argv[0]);
             return 0;
+        case 5:
+            thread_nums = strtol(argv[4], NULL, 10);
         case 4:
             times = strtol(argv[3], NULL, 10);
         case 3:
@@ -36,7 +39,7 @@ int main(int argc, char *argv[]) {
     } else {
         log_init(&Global_File_Logger, "./log.txt");
     }
-    thread_pool *pool = thread_pool_create(64);
+    thread_pool *pool = thread_pool_create(thread_nums);
     for (int i = 0; i < times; ++i) {
         thread_pool_add(pool, ping, url);
     }
